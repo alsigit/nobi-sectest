@@ -1,6 +1,6 @@
 # nobi-sectest
-nobi security technical test by sigit setiawan
-all tools used during this test listed in tools.txt in this repo
+# nobi security technical test by sigit setiawan
+# all tools used during this test listed in tools.txt in this repo
 
 A. Find Vulnerability
 Tasks:
@@ -91,5 +91,12 @@ This issue founded, since some subdomain with wordpress CMS doesn't yet finished
 Step to reproduce:
 1. Try to enumerate all subdomain under addityar.xyz , we can use tools like subdomainfinder, raccoon, virustotal etc.
   <img src="https://github.com/alsigit/nobi-sectest/blob/main/subdomain.png" width="700"/>
+  
+2. The domain adit.addityar.xyz is vulnerable to takeover by attacker, just follow the step for wordpress installation.
+  <img src="https://github.com/alsigit/nobi-sectest/blob/main/WP_takeover.png" width="700"/>
+  
+Impact : An attacker can takeover this subdomain for malicious action like pishing or etc, this will make an impact for brand reputation.
+
+
 
 
