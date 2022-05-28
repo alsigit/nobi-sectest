@@ -54,10 +54,42 @@ Step to reproduce:
 
 By analize some information in debug mode, I try to re-enumerate / fuzzing directory and successfully found this endpoint:
 https://testing.addityar.xyz/api/v1/ib/member
+
 https://testing.addityar.xyz/api/v1/ib/withdraw
+
 https://testing.addityar.xyz/api/v1/ib/topup
+
 https://testing.addityar.xyz/api/v1/ib/updateTotalBalance
+
 https://testing.addityar.xyz/api/v1/ib/listNAB
 
+**recommendation**:
+Always disable debug mode on production environment or public application.
+
+**3. IDOR (Insecure Direct Object Reference)**
+IDOR usually followed by excessive data exposure, which means anyone get access to something which is not allowed or don’t have that privilege to do that action on that web application.
+
+Step to reproduce:
+1. Using cURL, burpsuite or directly access via browser we can go to https://testing.addityar.xyz/api/v1/member
+   <img src="https://github.com/alsigit/nobi-sectest/blob/main/member.png" width="700"/>
+   
+2. as we can see, it shown vulnerable endpoint https://testing.addityar.xyz/api/v1/member?page={IDOR_HERE}
+  <img src="https://github.com/alsigit/nobi-sectest/blob/main/IDOR.png" width="700"/>
+  
+  by changing parameter page, anyone can see others user sensitive informations like id, name, balance and unit. This informations ideally should not shown to others user.
+
+Impact : 
+- Leaked PII (Personal Identifiable Information) possibility 
+- Data breach
+
+**recommendation:** Implement session management, PII should not shown to any users instead his/her own information. we can use authorization by implement JWT, or any session token.
+
+**4. Subdomain Takeover**
+An attacker can hijack your subdomain, takeover the webpage for any malicious action.
+This issue founded, since some subdomain with wordpress CMS doesn't yet finished installation.
+
+Step to reproduce:
+1. Try to enumerate all subdomain under addityar.xyz , we can use tools like subdomainfinder, raccoon, virustotal etc.
+  <img src="https://github.com/alsigit/nobi-sectest/blob/main/subdomain.png" width="700"/>
 
 
