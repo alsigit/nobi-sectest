@@ -1,6 +1,8 @@
 # nobi-sectest
 # nobi security technical test by sigit setiawan
 # all tools used during this test listed in tools.txt this repo
+# all severity based on CVSS calculator https://www.first.org/cvss/calculator/3.1
+# I will include in every each finding, then you can make a correction if any false positive or mistaken
 
 A. Find Vulnerability
 Tasks:
@@ -14,6 +16,8 @@ I found so many vulnerabilities in this endpoint API:
 
 **1. Leaked API endpoint with no Authentication.**
    API can lack authentication mechanisms altogether. Assume API endpoints will only be accessed by authorized applications and will not be discovered by anyone else. But It will depend on business process of the application, sometimes this could be a part of application flow process that required free access for anyone.
+   
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore1.png" width="500"/>
 
 Step to reproduce:
 1. Try to enumerate directory from https://testing.addityar.xyz/
@@ -48,6 +52,8 @@ since there is no authentication for this endpoint, an attacker / anyone can add
 **2. Laravel Debug Mode Enabled**
 It is dangerous if developer enabling debug mode on production server or public server, Attacker can see some sensitive information like path, route, or etc.
 
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore2.png" width="500"/>
+
 Step to reproduce:
 1. open your browser, go to https://testing.addityar.xyz/api/v1/user/add
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/debug_mode.png" width="700"/>
@@ -68,9 +74,10 @@ https://testing.addityar.xyz/api/v1/ib/updateTotalBalance
 
 https://testing.addityar.xyz/api/v1/ib/listNAB
 
-**regarding vulnerability at point 1 before, I can confirm all endpoint API lack of authentication, and I will update this severity as CRITICAL, since it will impact:
-**1. Financial impact (fraud, etc), since anyone can do financial activity without any authentication and no authorization implemented**
-**2. Data privacy issue**
+**regarding vulnerability at point 1 before, I can confirm all endpoint API lack of authentication, and I will update this severity as CRITICAL, since it will impact:**
+
+1. Financial impact (fraud, etc), since anyone can do financial activity without any authentication and no authorization implemented
+2. Data privacy issue**
 
 **recommendation**:
 - Always disable debug mode on production environment or public application.
@@ -80,6 +87,8 @@ https://testing.addityar.xyz/api/v1/ib/listNAB
 
 **3. IDOR (Insecure Direct Object Reference)**
 IDOR usually followed by excessive data exposure, which means anyone get access to something which is not allowed or don’t have that privilege to do that action on that web application.
+
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore3.png" width="500"/>
 
 Step to reproduce:
 1. Using cURL, burpsuite or directly access via browser we can go to https://testing.addityar.xyz/api/v1/member
@@ -98,6 +107,8 @@ Impact :
 
 **4. Lack of Resources & No Rate Limit API**
 Rate-limiting prevent users overwhelming API with requests, limiting denial of service threats. But in this endpoint API test, I can confirm all endpoint does not have any rate limit for http requests.
+
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore4.png" width="500"/>
 
 Step to reproduce:
 1. I give some sample for topup endpoint
@@ -132,6 +143,8 @@ The first thing you can do is to determine what is “normal usage” for that p
 An attacker can hijack your subdomain, takeover the webpage for any malicious action.
 This issue founded, since some subdomain with wordpress CMS doesn't yet finished installation.
 
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore5.png" width="500"/>
+
 Step to reproduce:
 1. Try to enumerate all subdomain under addityar.xyz , we can use tools like subdomainfinder, raccoon, virustotal etc.
   <img src="https://github.com/alsigit/nobi-sectest/blob/main/subdomain.png" width="700"/>
@@ -148,8 +161,8 @@ PS : I will not takeover this subdomain, since this domain used for test and I b
 2. to avoid any subdomain takeover, you must periodically control all A record or CNAME record in the DNS Manager.
    <img src="https://github.com/alsigit/nobi-sectest/blob/main/WP_takeover.png" width="500"/>
    
-**B. Test Cases**
-- As Security Engineer you must secure your infrastructure and API services, if your API
+**B. Test Cases
+As Security Engineer you must secure your infrastructure and API services, if your API
 always get attack from attacker ( ddos , brute force, etc ). How should you handle the
 attack?. Can you give advice on how to design the best security for infrastructure
 security and API services.
@@ -193,6 +206,7 @@ As mentioned earlier, at application layer protection we need to do some risk ma
   i. Using AWS Cognito for authentication (if needed)
   
 **+++ OSI Layer 3+++**
+
 For network layer, we must implement:
 - AWS firewall and activate WAF with advanced rules (do not use basic rules, since so many cases it can bypassed)
 - Separate between network application route and databases route.
@@ -201,9 +215,23 @@ For network layer, we must implement:
 - Using Cloudfront for edge caching
 - Combine Route 53 with AWS ELB/ALB for make sure high availability performance
 - Implement Cloud shield for protecting DoS attack.
+
+**+++ Create Policies and governance++**
+1. governance must be separate with Risk management
+2. Setup policy for organization (it can be adopt PCI DSS for financial industry)
    
-                 
 Below sample AWS infrastruture recommendation for prevent attack and securing API:
+
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/architecture.png" width="700"/>
+
+**C. Security checklist**
+
+**You are asked to assess a new mobile application (android and ios) , this mobile application has
+backend API as well resided in cloud. What are the checklist / to-dos to ensure security
+measurement is enough for the app go live**
+
+**answer**
+
 
 
 
