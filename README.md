@@ -1,6 +1,6 @@
 # nobi-sectest
 # nobi security technical test by sigit setiawan
-# all tools used during this test listed in tools.txt in this repo
+# all tools used during this test listed in tools.txt this repo
 
 A. Find Vulnerability
 Tasks:
@@ -12,7 +12,7 @@ Test Points:
 **Answer**
 I found so many vulnerabilities in this endpoint API:
 
-**1. Leaked endpoint with no Authentication.**
+**1. Leaked API endpoint with no Authentication.**
    API can lack authentication mechanisms altogether. Assume API endpoints will only be accessed by authorized applications and will not be discovered by anyone else. But It will depend on business process of the application, sometimes this could be a part of application flow process that required free access for anyone.
 
 Step to reproduce:
@@ -51,20 +51,31 @@ It is dangerous if developer enabling debug mode on production server or public 
 Step to reproduce:
 1. open your browser, go to https://testing.addityar.xyz/api/v1/user/add
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/debug_mode.png" width="700"/>
+we can see that web directory located at **/home/ubuntu/nobi-test/**
 
 By analize some information in debug mode, I try to re-enumerate / fuzzing directory and successfully found this endpoint:
 https://testing.addityar.xyz/api/v1/ib/member
 
 https://testing.addityar.xyz/api/v1/ib/withdraw
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/withdraw.png" width="700"/>
 
 https://testing.addityar.xyz/api/v1/ib/topup
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/topup.png" width="700"/>
 
 https://testing.addityar.xyz/api/v1/ib/updateTotalBalance
+<img src="https://github.com/alsigit/nobi-sectest/blob/main/updatebalance.png" width="700"/>
 
 https://testing.addityar.xyz/api/v1/ib/listNAB
 
+**regarding vulnerability at point 1 before, I can confirm all endpoint API lack of authentication, and I will update this severity as CRITICAL, since it will impact:
+**1. Financial impact (fraud, etc), since anyone can do financial activity without any authentication and no authorization implemented**
+**2. Data privacy issue**
+
 **recommendation**:
-Always disable debug mode on production environment or public application.
+- Always disable debug mode on production environment or public application.
+- Implement best security practice for programming, user_id must not integer sequentially without any hashes.
+- Implement auth/session management for endpoint API
+- Do not put any PII in the response body whitout any hashing
 
 **3. IDOR (Insecure Direct Object Reference)**
 IDOR usually followed by excessive data exposure, which means anyone get access to something which is not allowed or don’t have that privilege to do that action on that web application.
@@ -84,7 +95,36 @@ Impact :
 
 **recommendation:** Implement session management, PII should not shown to any users instead his/her own information. we can use authorization by implement JWT, or any session token.
 
-**4. Subdomain Takeover**
+**4. Lack of Resources & No Rate Limit API**
+Rate-limiting prevent users overwhelming API with requests, limiting denial of service threats. But in this endpoint API test, I can confirm all endpoint does not have any rate limit for http requests.
+
+Step to reproduce:
+1. I give some sample for topup endpoint
+2. Using burpsuite, try to access https://testing.addityar.xyz/api/v1/ib/topup with POST method and Content-Type: application/json
+3. Intercept, request and sent it to intruder.
+4. set payload type as sniper with sequentially payload like this
+   
+   ````
+   {"user_id":"2", "amount_rupiah":"$100000$"}
+   ````
+ 5. set payload position to anything you want.
+ 
+  <img src="https://github.com/alsigit/nobi-sectest/blob/main/noratelimit.png" width="700"/>
+ 7. All request got 200 code, which means all success and no rate limit.
+
+Impact : 
+- Potentially allow attackers to launch Denial of Service (DoS) attacks.
+- Another issue, if you have any authentication endpoint, this issue will impact for brute force attack.
+- This issue also have an impact to financial loss, if you have any notification service such as SMS gateway, because it will consume all costs for notification.
+
+**recommendation:**
+The appropriate rate and resource limit for each functionality usually always different. 
+For instance, the rate limit for authentication endpoints should be much lower to prevent brute-forcing and password guessing attacks. 
+The first thing you can do is to determine what is “normal usage” for that particular functionality. Then, block users whose request resources at a much higher rate than usual.
+- If number of requests has exceeded the rate limits, it will throw 429 Too Many Requests
+- After receiving a 429 response, your API should pause for a second from sending additional requests. 
+
+**5. Subdomain Takeover**
 An attacker can hijack your subdomain, takeover the webpage for any malicious action.
 This issue founded, since some subdomain with wordpress CMS doesn't yet finished installation.
 
@@ -96,6 +136,28 @@ Step to reproduce:
   <img src="https://github.com/alsigit/nobi-sectest/blob/main/WP_takeover.png" width="700"/>
   
 Impact : An attacker can takeover this subdomain for malicious action like pishing or etc, this will make an impact for brand reputation.
+
+PS : I will not takeover this subdomain, since this domain used for test and I believe so many tester needs to check during NOBI recruitment test.
+
+**recommendation**
+1. for wordpress site, don't forget to finish your installation setup.
+2. to avoid any subdomain takeover, you must periodically control all A record or CNAME record in the DNS Manager.
+   <img src="https://github.com/alsigit/nobi-sectest/blob/main/WP_takeover.png" width="500"/>
+   
+**B. Test Cases**
+- As Security Engineer you must secure your infrastructure and API services, if your API
+always get attack from attacker ( ddos , brute force, etc ). How should you handle the
+attack?. Can you give advice on how to design the best security for infrastructure
+security and API services.
+
+**Answer**
+Before design best practice for infrastructure, I also always see from business perspective for example :
+- What goals, company vision and mision?
+- How much costs/budget alocated to infrastructure?
+- Where is the infratructure set up ? On premise or Cloud?
+All points above need to defined at first and will be a part for policy and governance, to make sure infratructure cost are not over kill, but also meets best practice for security.
+
+Since this test running on AWS environment, I will answer it from cloud environment perspective.
 
 
 
