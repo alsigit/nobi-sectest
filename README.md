@@ -4,14 +4,16 @@
 # Each severity based on CVSS calculator https://www.first.org/cvss/calculator/3.1
 # I will put severity in each finding, then you can make a correction if any false positive or mistaken
 
-A. Find Vulnerability
-Tasks:
+**A. Find Vulnerability**
+
+**Tasks:** 
 - Security analysis on our API : https://testing.addityar.xyz/
 Test Points:
 - Find the vulnerability on our API
 - Can provide security solutions from vulnerabilities found
 
 **Answer**
+
 I found so many vulnerabilities in this endpoint API:
 
 **1. LEAKED API ENDPOINT WITH NO AUTHENTICATION.**
