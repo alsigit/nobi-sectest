@@ -1,8 +1,8 @@
 # nobi-sectest
 # nobi security technical test by sigit setiawan
 # all tools used during this test listed in tools.txt this repo
-# all severity based on CVSS calculator https://www.first.org/cvss/calculator/3.1
-# I will include in every each finding, then you can make a correction if any false positive or mistaken
+# Each severity based on CVSS calculator https://www.first.org/cvss/calculator/3.1
+# I will put severity in each finding, then you can make a correction if any false positive or mistaken
 
 A. Find Vulnerability
 Tasks:
@@ -14,7 +14,8 @@ Test Points:
 **Answer**
 I found so many vulnerabilities in this endpoint API:
 
-**1. Leaked API endpoint with no Authentication.**
+**1. LEAKED API ENDPOINT WITH NO AUTHENTICATION.**
+
    API can lack authentication mechanisms altogether. Assume API endpoints will only be accessed by authorized applications and will not be discovered by anyone else. But It will depend on business process of the application, sometimes this could be a part of application flow process that required free access for anyone.
    
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore1.png" width="500"/>
@@ -49,7 +50,8 @@ since there is no authentication for this endpoint, an attacker / anyone can add
 - endpoint API ideally need authentication, from business perspective usually user with low privilige can not add new user before they are logged in and have session or token to authenticate.
 - to prevent fuzzing directory, developer must not use common path name like /api/v2/xxx because this words already listed on many wordlists or attacker can brute / fuzzing this path (but it doesn't need if API have authentication)
 
-**2. Laravel Debug Mode Enabled**
+**2. LARAVEL DEBUG MODE ENABLED**
+
 It is dangerous if developer enabling debug mode on production server or public server, Attacker can see some sensitive information like path, route, or etc.
 
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore2.png" width="500"/>
@@ -86,6 +88,7 @@ https://testing.addityar.xyz/api/v1/ib/listNAB
 - Do not put any PII in the response body whitout any hashing
 
 **3. IDOR (Insecure Direct Object Reference)**
+
 IDOR usually followed by excessive data exposure, which means anyone get access to something which is not allowed or don’t have that privilege to do that action on that web application.
 
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore3.png" width="500"/>
@@ -105,7 +108,8 @@ Impact :
 
 **recommendation:** Implement session management, PII should not shown to any users instead his/her own information. we can use authorization by implement JWT, or any session token.
 
-**4. Lack of Resources & No Rate Limit API**
+**4. LACK OF RESOUCE & NO RATE LIMIT**
+
 Rate-limiting prevent users overwhelming API with requests, limiting denial of service threats. But in this endpoint API test, I can confirm all endpoint does not have any rate limit for http requests.
 
 <img src="https://github.com/alsigit/nobi-sectest/blob/main/cvssscore4.png" width="500"/>
@@ -139,7 +143,8 @@ The first thing you can do is to determine what is “normal usage” for that p
 - If number of requests has exceeded the rate limits, it will throw 429 Too Many Requests
 - After receiving a 429 response, your API should pause for a second from sending additional requests. 
 
-**5. Subdomain Takeover**
+**5. SUBDOMAIN TAKEOVER**
+
 An attacker can hijack your subdomain, takeover the webpage for any malicious action.
 This issue founded, since some subdomain with wordpress CMS doesn't yet finished installation.
 
@@ -161,13 +166,23 @@ PS : I will not takeover this subdomain, since this domain used for test and I b
 2. to avoid any subdomain takeover, you must periodically control all A record or CNAME record in the DNS Manager.
    <img src="https://github.com/alsigit/nobi-sectest/blob/main/WP_takeover.png" width="500"/>
    
-**B. Test Cases
-As Security Engineer you must secure your infrastructure and API services, if your API
+**OTHER FINDING**
+
+I update this submission from any standpoint pentest:
+
+a. LARAVEL version are vulnerable to RCE (CVE-2021-3129) , recommended to use latest update version and as mentioned, do not enable debug mode.
+
+b. Nginx Web server version is 1.18.0 (CVE-2020-12440) which is vulnerable to HTTP request smuggling, allows attacker to cache poisoning, credential hijacking, or security bypass. Since nginx offically closed this issue as informative, I will not put this as a concern.
+
+**B. Test Cases**
+
+**As Security Engineer you must secure your infrastructure and API services, if your API
 always get attack from attacker ( ddos , brute force, etc ). How should you handle the
 attack?. Can you give advice on how to design the best security for infrastructure
-security and API services.
+security and API services.**
 
 **Answer**
+
 Before design best practice for infrastructure, I also always see from business perspective for example :
 - What goals, company vision and mision?
 - How much costs/budget alocated to infrastructure?
@@ -176,7 +191,9 @@ All points above need to defined at first and will be a part for policy and gove
 
 Since this test running on AWS environment, I will answer it from cloud environment perspective.
 First, we need to separate security based on OSI layer. for API, I will separate Application layer (Layer 7) and network layer (Layer 3)
+
 **+++ OSI Layer 7+++***
+
 As mentioned earlier, at application layer protection we need to do some risk mapping and mitigation:
 - Conduct security assessment for application periodically.
   This security assessment must be based on OWASP top API (https://owasp.org/www-project-api-security/)
@@ -217,6 +234,7 @@ For network layer, we must implement:
 - Implement Cloud shield for protecting DoS attack.
 
 **+++ Create Policies and governance++**
+
 1. governance must be separate with Risk management
 2. Setup policy for organization (it can be adopt PCI DSS for financial industry)
    
@@ -231,6 +249,77 @@ backend API as well resided in cloud. What are the checklist / to-dos to ensure 
 measurement is enough for the app go live**
 
 **answer**
+
+I will tested all environment including cloud infratructure security, API and mobile application security test.
+For Mobile application. Since almost every mobile app talks to a backend service, and those services are prone to the same types of web application attacks. 
+below my checklist:
+
+**1. Architecture, design and threat modelling**.  
+
+     first, we must identify all application component in mobile app, and make sure ecurity controls are never enforced only on the client side, but on        backend endpoints. we must put security as part of DevOps (DevsecOps), define threat modelling to identify potential upcoming threat, and sometimes        we must design for policy, and make sure comply with law.
+     
+**2. Data storage and privacy**
+
+     This will contains some checklist such as is there any storage for PII or sensitive information? Is there any criptography mechanism? 
+     For storage, we must ensure there are no sensitive data stored on application log, No sensitive data stored in memory for a long time, no sensitive        data/information stored locally. If sensitive data stored locally, make sure we have some encryption for all data. Also we need to make sure is there      any data shared to 3rd application, etc.
+     
+**3. Cryptography**
+
+     Application must have modern cryptography not primitive mechanism. Cryptography mechanism also must not deprecated for security purpose (0day with        critical CVE widely exposed). And make sure no key hardcoded in application.
+     
+**4. Authentication, Authorization and session management**
+
+     This related with my finding on this test.
+     - Authorization must be enforced at backend endpoint
+     - Implement session management. If your mobile app using stateful session, API endpoint can use random generated session to authenticate client              requests without sending credentials data.
+     - Endpoint terminated session when user log out.
+     - Token must have expiration time
+     - Endpoint must have rate limit
+     - etc
+     
+ **5. Network communication**
+ 
+    For example, data must be encrypted using TLS on the network layer. Implement SSL pinning with Java Native Interface (JNI), and make sure certifate
+    signed by trusted CA.
+    
+ **6. Mobile Platform Interaction**
+ 
+   - Make sure all input are sanitized, never trust user input.
+   - Testing for possible deserialization
+   - Make sure webview only rendering javascript within app package.
+ 
+ **7. Code Quality and setting**
+ 
+   - Always check for dependency confusion, some application use private package that vulnerable to takeover the dependency and will have impact to RCE.
+   - Built setting must be in release mode, do not use debug mode.
+   - Check for 3rd library, is there any CVE related.
+   - How app catches and handles exceptions.
+   - etc
+ 
+ **8. Resilience (e.g from tampering and reverse engineering)**
+ 
+   - Implement obfuscation
+   - All executable files and libraries app are encrypted on the file level
+   - Check for app detect and response to reverse engineering tools
+   - etc
+
+**9. Business logic**
+
+   The other test that usually I do, I will check business process/logic. We can not trust only to technical test, because based on my experience I have
+   found many business logic vulnerability that will make financial loss or fraud mechanism.
+   
+   
+Thank you and Have a nice day !!
+
+ 
+ 
+     
+     
+     
+     
+
+    
+   
 
 
 
