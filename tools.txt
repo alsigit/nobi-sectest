@@ -1,0 +1,24 @@
+Tools used during this test :
+1. Burpsuite
+   as a proxy to intercept HTTP requests, DNS pingback, etc
+
+2. Ffuf
+   For faster fuzzing directory
+   https://github.com/ffuf/ffuf
+   
+3. Nmap
+   For scanning any open port
+   
+4. httprobe
+   A tools made by Tom hudson to take a list of domains and probe for working http and https servers.
+   https://github.com/tomnomnom/httprobe
+   
+5. SQLmap
+   for pentest SQL injection vulnerability without manually injection
+   
+6. Pacu
+   An opensource tools by Rhinosecuritylab for assess AWS environment
+   https://github.com/RhinoSecurityLabs/pacu
+   
+
+Have a nice day !!
